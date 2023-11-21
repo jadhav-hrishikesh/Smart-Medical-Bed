@@ -1,0 +1,170 @@
+#include <Servo.h> 
+#define sw1_pin 5 
+#define sw2_pin 6 
+#define sw3_pin 9
+#define sw4_pin 10
+#define sw5_pin 11
+Servo myservo; 
+volatile boolean sw1 = false; 
+volatile boolean sw2 = false; 
+volatile boolean sw3 = false; 
+volatile boolean sw4 = false;
+volatile boolean sw5 = false;  
+uint8_t sw1ButtonState = 0; 
+uint8_t sw2ButtonState = 0; 
+uint8_t sw3ButtonState = 0; 
+uint8_t sw4ButtonState = 0;
+uint8_t sw5ButtonState = 0;  
+uint8_t lastsw1ButtonState = 0; 
+uint8_t lastsw2ButtonState = 0; 
+uint8_t lastsw3ButtonState = 0; 
+uint8_t lastsw4ButtonState = 0; 
+uint8_t lastsw5ButtonState = 0;
+int pos=0;
+int memory=0;
+void setup() 
+{ 
+  Serial.begin(9600); 
+  pinMode(sw1_pin, INPUT_PULLUP); 
+  pinMode(sw2_pin, INPUT_PULLUP); 
+   pinMode(sw3_pin, INPUT_PULLUP); 
+  pinMode(sw4_pin, INPUT_PULLUP);
+   pinMode(sw5_pin, INPUT_PULLUP);
+  myservo.attach(3); 
+  }
+  void loop() { 
+    checkIfSw1ButtonIsPressed(); 
+    checkIfSw2ButtonIsPressed(); 
+       checkIfSw3ButtonIsPressed(); 
+    checkIfSw4ButtonIsPressed(); 
+    checkIfSw5ButtonIsPressed(); 
+    if( sw1){ 
+      if(pos<=180)
+      {
+      Serial.println("Raise the bed.");
+      myservo.write(pos); 
+      Serial.println(pos);
+      }
+        sw1 = false;
+      delay(15);
+      } 
+      else if( sw2){ 
+        if(pos>0)
+        {
+            Serial.println("Lower the bed.");
+            myservo.write(pos); 
+            Serial.println(pos);
+        }
+             sw2 = false;    
+        delay(15); 
+        }
+        else if( sw3){ 
+            Serial.println("Saved the position at ");
+             sw3 = false; 
+      //myservo.write(pos); 
+      Serial.println(memory);   
+        delay(15); 
+        }
+      else if( sw4){ 
+        if(pos>0){
+            Serial.println("Recall to saved position.");
+        }
+        else
+        {
+           Serial.println("No saved position found.");
+        }
+             sw4 = false; 
+      myservo.write(pos); 
+      Serial.println(memory);
+      Serial.println(pos);   
+        delay(15); 
+        }
+         else if( sw5){ 
+            Serial.println("Reset to 0.");
+             sw5 = false; 
+      myservo.write(pos); 
+      delay(15); 
+        }
+        
+        } 
+         void checkIfSw3ButtonIsPressed()
+        {
+          sw3ButtonState = digitalRead(sw3_pin);
+          if (sw3ButtonState != lastsw3ButtonState)
+          {
+            if ( sw3ButtonState == 0) 
+            {
+              sw3=true; 
+              memory=pos;
+            }
+            delay(50); 
+            } 
+            lastsw3ButtonState = sw3ButtonState; 
+          }
+         void checkIfSw4ButtonIsPressed()
+        {
+          sw4ButtonState = digitalRead(sw4_pin);
+          if (sw4ButtonState != lastsw4ButtonState)
+          {
+            if ( sw4ButtonState == 0) 
+            {
+              sw4=true; 
+              pos=memory;
+            }
+            delay(50); 
+            } 
+            lastsw4ButtonState = sw4ButtonState; 
+          }
+            void checkIfSw5ButtonIsPressed()
+        {
+          sw5ButtonState = digitalRead(sw5_pin);
+          if (sw5ButtonState != lastsw5ButtonState)
+          {
+            if ( sw5ButtonState == 0) 
+            {
+              sw5=true; 
+              pos=0;
+              memory=pos;
+            }
+            delay(50); 
+            } 
+            lastsw5ButtonState = sw5ButtonState; 
+          }
+        void checkIfSw1ButtonIsPressed()
+        {
+          sw1ButtonState = digitalRead(sw1_pin);
+          if (sw1ButtonState != lastsw1ButtonState)
+          {
+            if ( sw1ButtonState == 0) 
+            {
+              sw1=true; 
+              if(pos<=180)
+              {
+                pos=pos+10;
+              }
+              else
+              {
+                pos=pos-10;
+              }
+            }
+            delay(50); 
+            } 
+            lastsw1ButtonState = sw1ButtonState; 
+          }
+        void checkIfSw2ButtonIsPressed() 
+        { sw2ButtonState = digitalRead(sw2_pin); 
+        if (sw2ButtonState != lastsw2ButtonState) 
+        {
+          if ( sw2ButtonState == 0) {
+            sw2=true; 
+             if(pos>=0)
+              {
+                pos=pos-10; 
+              }
+              else
+              {
+                pos=pos+10; 
+              }
+            } delay(50); 
+            } lastsw2ButtonState = sw2ButtonState; 
+        }
